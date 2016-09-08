@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/funnel-input_base_path-idf1Rt3I.tmp/0/bower_components/ember-cli-test-loader/test-loader.js

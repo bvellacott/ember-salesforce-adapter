@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/node_modules/ember-cli/CONTRIBUTING.md

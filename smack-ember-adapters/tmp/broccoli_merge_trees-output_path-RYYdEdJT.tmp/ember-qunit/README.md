@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/broccoli_merge_trees-input_base_path-5aHsF1aB.tmp/10/ember-qunit/README.md

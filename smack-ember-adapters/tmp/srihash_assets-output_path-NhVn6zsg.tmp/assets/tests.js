@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/concat_with_maps-output_path-7sOpLDs4.tmp/assets/tests.js

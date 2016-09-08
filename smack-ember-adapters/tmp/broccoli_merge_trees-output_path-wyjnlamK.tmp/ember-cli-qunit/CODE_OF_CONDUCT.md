@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/broccoli_merge_trees-input_base_path-cHmMEhDn.tmp/10/ember-cli-qunit/CODE_OF_CONDUCT.md

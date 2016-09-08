@@ -1,0 +1,2 @@
+define('npm:smack-js-compiler', function(){ return { 'default': require('smack-js-compiler')};})
+define('npm:where-clause-evaluate', function(){ return { 'default': require('where-clause-evaluate')};})

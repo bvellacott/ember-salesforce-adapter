@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/broccoli_merge_trees-input_base_path-pXh03BwU.tmp/0/assets/tests.js

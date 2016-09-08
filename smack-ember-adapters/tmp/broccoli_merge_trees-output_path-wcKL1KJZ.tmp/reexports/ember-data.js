@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/reexporter-output_path-CRmIhuf3.tmp/reexports/ember-data.js

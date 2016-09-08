@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/reexporter-output_path-Dofvw6iS.tmp/reexports/ember-inflector.js

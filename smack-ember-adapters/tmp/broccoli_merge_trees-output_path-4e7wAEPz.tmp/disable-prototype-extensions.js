@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/broccoli_merge_trees-input_base_path-dSZ8iaM6.tmp/0/disable-prototype-extensions.js

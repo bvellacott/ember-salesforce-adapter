@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/plugin-output_path-yZONYrK7.tmp/browserify_stubs.js

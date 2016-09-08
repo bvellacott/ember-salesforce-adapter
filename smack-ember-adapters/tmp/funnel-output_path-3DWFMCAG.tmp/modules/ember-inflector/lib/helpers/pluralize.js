@@ -1,0 +1,1 @@
+/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/funnel-input_base_path-XNZzzA4b.tmp/0/lib/helpers/pluralize.js
