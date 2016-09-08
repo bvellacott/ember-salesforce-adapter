@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/creator-output_path-vDgrYF76.tmp/version.js

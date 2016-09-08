@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/bower_components/ember-cli-test-loader/test-loader.js

@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/creator-output_path-ovy3GNx5.tmp/version.js

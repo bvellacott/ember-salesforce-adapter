@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/config_replace-output_path-kz8qddCT.tmp/test-support-prefix.js

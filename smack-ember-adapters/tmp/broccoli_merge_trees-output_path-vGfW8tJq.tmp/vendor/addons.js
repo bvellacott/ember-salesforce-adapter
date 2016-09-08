@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/concat_with_maps-output_path-UTm5fXmX.tmp/addons.js

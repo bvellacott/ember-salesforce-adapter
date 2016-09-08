@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/config_replace-output_path-HF43nVvr.tmp/tests-suffix.js

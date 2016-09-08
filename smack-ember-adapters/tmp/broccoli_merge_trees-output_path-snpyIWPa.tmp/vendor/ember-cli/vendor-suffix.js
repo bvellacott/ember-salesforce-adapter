@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/config_replace-output_path-ASSuv4y0.tmp/vendor-suffix.js

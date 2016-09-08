@@ -1,1 +1,0 @@
-/home/benjamin/Desktop/projects/node/smack-ember-adapters/tmp/funnel-input_base_path-oic81XQD.tmp/0//testem.js
