@@ -4,4 +4,4 @@ export {
   SFAdapter
 };
 
-export default LSAdapter;
+export default SFAdapter;

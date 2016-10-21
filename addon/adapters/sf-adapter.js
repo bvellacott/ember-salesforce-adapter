@@ -1,18 +1,22 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import SFModels from 'npm:salesforce-ember-models';
+SFModels.Ember = Ember;
+SFModels.DS = DS;  
 
-SFAdapter = DS.RESTAdapter.extend({
+var SFAdapter = DS.RESTAdapter.extend({
+  sforce: window.sforce ? window.sforce : undefined,
   find : function(store, type, id, snapshot) {
     return this.findRecord(store, type, id, snapshot);
   },
-  findRecord : function(store, type, id, snapshot) {
+  findRecord : function(store, type, id) {
     return this.query(store, type, "Id = '" + id + "'");
   },
   createRecord: function(store, type, snapshot) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
-        var obj = Papu.SF.sfFormatSnapshot(snapshot, type);
-        var res = sforce.connection.create([obj], 
+        var obj = SFModels.sfFormatSnapshot(snapshot, type);
+        SFAdapter.sforce.connection.create([obj], 
         function(res) {
           snapshot.id = res[0].id;
           var pl = {};
@@ -20,9 +24,9 @@ SFAdapter = DS.RESTAdapter.extend({
           Ember.run(null, resolve, pl);
           
           // Update record in the background - in case it has values that are calculated on the server
-          Papu.SF.query(store, type, "Id = '" + res[0].id + "'", 
+          SFModels.query(store, type, "Id = '" + res[0].id + "'", 
             function(res) {
-              var r = Papu.SF.formatPayload(type, res);
+              var r = SFModels.formatPayload(type, res);
               store.pushPayload(type.modelName, r);
             }, 
             function(err) { 
@@ -44,18 +48,18 @@ SFAdapter = DS.RESTAdapter.extend({
   updateRecord: function(store, type, snapshot) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
-        var obj = Papu.SF.sfFormatSnapshot(snapshot, type);
-        var res = sforce.connection.update([obj], 
+        var obj = SFModels.sfFormatSnapshot(snapshot, type);
+        SFAdapter.sforce.connection.update([obj], 
         function(res) {
-          Papu.SF.formatRecord(obj);
+          SFModels.formatRecord(obj);
           var pl = {};
           pl[type.modelName] = obj;
           Ember.run(null, resolve, pl);
 
           // Update record in the background - in case it has values that are calculated on the server
-          Papu.SF.query(store, type, "Id = '" + res[0].id + "'", 
+          SFModels.query(store, type, "Id = '" + res[0].id + "'", 
             function(res) {
-              var r = Papu.SF.formatPayload(type, res);
+              var r = SFModels.formatPayload(type, res);
               store.pushPayload(type.modelName, r);
             }, 
             function(err) { 
@@ -77,8 +81,8 @@ SFAdapter = DS.RESTAdapter.extend({
   deleteRecord: function(store, type, snapshot) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
-        sforce.connection.deleteIds([snapshot.id], 
-        function(res) {
+        SFAdapter.sforce.connection.deleteIds([snapshot.id], 
+        function() {
           Ember.run(null, resolve, {});
         },
         function(err) { 
@@ -93,11 +97,11 @@ SFAdapter = DS.RESTAdapter.extend({
       }
     });
   },
-  findAll: function(store, type, sinceToken) {
+  findAll: function(store, type) {
       return this.query(store, type);
   },
-    findMany : function(store, type, ids, snapshot) {
-      return this.query(store, type, "Id in " + Papu.SF.toSoqlArray(ids));
+    findMany : function(store, type, ids) {
+      return this.query(store, type, "Id in " + SFModels.toSoqlArray(ids));
     },
     findQuery : function(store, type, query) {
       return this.query(store, type, query);
@@ -105,9 +109,9 @@ SFAdapter = DS.RESTAdapter.extend({
     query : function(store, type, query) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
-        Papu.SF.query(store, type, query, 
+        SFModels.query(store, type, query, 
           function(res) {
-            var r = Papu.SF.formatPayload(type, res);
+            var r = SFModels.formatPayload(type, res);
             Ember.run(null, resolve, r);
           }, 
           function(err) { 
@@ -124,5 +128,7 @@ SFAdapter = DS.RESTAdapter.extend({
     },
     // For ember 2.0 compatibility
     shouldReloadAll : function(store, snapshot) { return store.peekAll( snapshot.type.modelName ).get("length") <= 0; },
-    shouldBackgroundReloadRecord : function(store, snapshot) { return true; },
+    shouldBackgroundReloadRecord : function() { return true; },
 });
+
+export default SFAdapter;
