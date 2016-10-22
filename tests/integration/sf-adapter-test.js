@@ -1,23 +1,56 @@
 import Ember from 'ember';
 import SFAdapter from 'ember-salesforce-adapter/adapters/sf-adapter';
-import { houseSchema, Snapshot, sforce, Store } from 'npm:sforce-mocks';
+import SFModels from 'npm:salesforce-ember-models';
+import mocks from 'npm:sforce-mocks';
+var houseSchema = mocks.houseSchema;
+var Snapshot = mocks.Snapshot;
+var sforce = mocks.sforce;
+var Store = mocks.Store;
 SFAdapter.sforce = sforce;
+SFModels.sforce = sforce;
 
 import {module, test} from 'qunit';
-const {run} = Ember;
+const { run } = Ember;
+
+var connection = {
+  describeGlobal() {
+    return { getArray(){ return [
+      { name : 'windowObj__c' }, 
+      { name : 'doorObj__c' }, 
+      { name : 'houseObj__c'} ]; }};
+  },
+  describeSObjects(objNames, success) { 
+    var result = [];
+    for(var i = 0; i < objNames.length; i++) {
+      var def = houseSchema.sfSchema[objNames[i]];
+      if(!def)
+      { throw 'object definition by the name: ' + objNames[i] + ' doesn\'t exist'; }
+      result.push(def);
+    }
+    success(result);
+  }
+};
 
 var mockApp;
+var mockSchemaReader;
 
 module('integration/adapters/ss-adapter - SFAdapter', {
   beforeEach() {
+    console.log(sforce);
+    mockSchemaReader = new SFModels.SchemaReader(connection, 100, () => { console.log('fetch complete'); });
     sforce.db.clear();
     sforce.db.useGivenIds = true;
     sforce.db.schema = houseSchema.sfSchema;
     mockApp = {};
-  },
+    SFModels.createModelsForSObjects(mockApp, mockSchemaReader.completeMetas, mockSchemaReader, houseSchema.typeFilter);
+   },
 
   afterEach() {
   }
+});
+
+test( 'SFAdapter.createRecord', function( t ) {
+  t.ok(true, 'testing one two');
 });
 
 test( 'SFAdapter.createRecord', function( t ) {
