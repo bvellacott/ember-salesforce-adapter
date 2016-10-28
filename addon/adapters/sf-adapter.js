@@ -20,18 +20,21 @@ var SFAdapter = DS.RESTAdapter.extend({
         function(res) {
           snapshot.id = res[0].id;
           var pl = {};
-          pl[type.modelName] = snapshot;
+          // snapshot.type = Ember.String.dasherize(type.modelName);
+          // snapshot.modelName = snapshot.type;
+          // pl[snapshot.type] = snapshot;
+          pl[type.modelName] = obj;
           Ember.run(null, resolve, pl);
           
           // Update record in the background - in case it has values that are calculated on the server
-          SFModels.query(store, type, "Id = '" + res[0].id + "'", 
-            function(res) {
-              var r = SFModels.formatPayload(type, res);
-              store.pushPayload(type.modelName, r);
-            }, 
-            function(err) { 
-              console.log(err); 
-            });
+          // SFModels.query(store, type, "Id = '" + res[0].id + "'", 
+          //   function(res) {
+          //     var r = SFModels.formatPayload(type, res);
+          //     store.pushPayload(type.modelName, r);
+          //   }, 
+          //   function(err) { 
+          //     console.log(err); 
+          //   });
         },
         function(err) { 
           console.log(err); 
@@ -100,19 +103,19 @@ var SFAdapter = DS.RESTAdapter.extend({
   findAll: function(store, type) {
       return this.query(store, type);
   },
-    findMany : function(store, type, ids) {
-      return this.query(store, type, "Id in " + SFModels.toSoqlArray(ids));
-    },
-    findQuery : function(store, type, query) {
-      return this.query(store, type, query);
-    },
-    query : function(store, type, query) {
+  findMany : function(store, type, ids) {
+    return this.query(store, type, "Id in " + SFModels.toSoqlArray(ids));
+  },
+  findQuery : function(store, type, query) {
+    return this.query(store, type, query);
+  },
+  query : function(store, type, query) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
         SFModels.query(store, type, query, 
           function(res) {
             var r = SFModels.formatPayload(type, res);
-            Ember.run(null, resolve, r);
+            Ember.run(null, resolve, r); 
           }, 
           function(err) { 
             console.log(err); 
@@ -125,10 +128,10 @@ var SFAdapter = DS.RESTAdapter.extend({
         Ember.run(null, reject, e);
       }
     });
-    },
-    // For ember 2.0 compatibility
-    shouldReloadAll : function(store, snapshot) { return store.peekAll( snapshot.type.modelName ).get("length") <= 0; },
-    shouldBackgroundReloadRecord : function() { return true; },
+  },
+  // For ember 2.0 compatibility
+  shouldReloadAll : function(store, snapshot) { return store.peekAll( snapshot.type.modelName ).get("length") <= 0; },
+  shouldBackgroundReloadRecord : function() { return true; },
 });
 
 export default SFAdapter;
