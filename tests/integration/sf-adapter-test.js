@@ -4,17 +4,15 @@ import SFAdapter from 'ember-salesforce-adapter/adapters/sf-adapter';
 import SFModels from 'npm:salesforce-ember-models';
 import mocks from 'npm:sforce-mocks';
 var houseSchema = mocks.houseSchema;
-var Snapshot = mocks.Snapshot;
 var sforce = mocks.sforce;
-var Store = mocks.Store;
 SFAdapter.sforce = sforce;
 SFModels.sforce = sforce;
 
 import {module, test} from 'qunit';
 
-const {run, get, set} = Ember;
+const {run} = Ember;
 
-let env, store, List, Item, Order, Hour, Person;
+let env, store;
 
 var connection = {
   describeGlobal() {
@@ -78,47 +76,44 @@ test('exists through the store', function(assert) {
 });
 
 test( 'SFAdapter.createRecord', function( t ) {
-  t.expect(8);
+  t.expect(1);
   const done = t.async();
-  var count = 0;
-  // Setup
-  // var fa = new SFAdapter();
-  // var store = new Store();
-  
-  for(var emberModelName in houseSchema.formattedSnapshots) {
-    var dasherized = Ember.String.dasherize(emberModelName);
-    // var emberModel = models[emberModelName];
-    // emberModel.modelName = emberModelName;
-  
-    var records = houseSchema.snapshots[emberModelName];
-    for(var i = 0; i < records.length; i++) {
-      // var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-      // var snapshot = new Snapshot(mockInstance);
-      // fa.createRecord(store, emberModel, snapshot);
-      var expectedRecord = records[i];
-      expectedRecord.id = null;
-      expectedRecord.readyByDate__c = null;
-      expectedRecord.housePartyTime__c = null;
-      var record = run(store, 'createRecord', dasherized, expectedRecord);
-      run(record, 'save');
-      var records = run(store, 'query', dasherized, "Name = '" + expectedRecord.Name + "'").then(records => {
-        // assert.equal(get(records, 'length'), 1, 'Only Rambo was found');
-        t.deepEqual(records.objectAt(0).serialize(), expectedRecord, "Record saved and unchanged");
-        // t.ok(true, 'testing one two');
-        count++;
-        if(count === 8)
-          done();
-      });
-      // for(var key in payloads[i]) {
-      //   for(var field in payloads[i][key][0]) {
-      //     if(typeof payloads[i][key][0][field] !== 'object') 
-      //     { t.equal(store.payload[key][0][field], payloads[i][key][0][field], 'Object creation failed on the field: ' + field + ' in object list: ' + key); }
-      //     else
-      //     { t.deepEqual(store.payload[key][0][field], payloads[i][key][0][field], 'Object creation failed on the field: ' + field + ' in object list: ' + key); }
-      //   }
-      // }
-    }
-  }
+
+  var expectedRecord = {
+    id : null,
+    Name : 'Our House',
+    isBigHouse__c : true,
+    housePartyTime__c : "2017-01-01T12:00:00.000Z",
+    cost__c : 70000,
+    readyByDate__c : "2017-01-01T00:00:00.000Z",
+    ownerContact__c : "Kimberly",
+    height__c : 7,
+    address__c : 'Blackfriars',
+    contactPhone__c : '07461231236',
+    floorPlan__c : 'large',
+    insurances__c : 'only required',
+    description__c : 'beautiful',
+    alarmPin__c : "1234",
+    website__c : 'ourhouse.com',
+    floors__c : 3,
+  };
+  var record = run(store, 'createRecord', 'house-objccc', expectedRecord);
+
+  // set all non-updateable fields to null and false on the expected record as that's how they should return
+  expectedRecord.isBigHouse__c = false;
+  expectedRecord.insurances__c = null;
+  expectedRecord.ownerContact__c = null;
+
+  run(record, 'save').then(() => {
+    run(store, 'query', 'house-objccc', "Name = '" + expectedRecord.Name + "'").then(records => {
+      var result = records.objectAt(0).serialize();
+
+      // set the id on the result to null for comparison because the id isn't known before save
+      result.id = null;
+      t.deepEqual(result, expectedRecord, "Record saved and unchanged");
+      done();
+    });
+  });
 });
 
 // test( 'SFAdapter.findRecord', function( t ) {
