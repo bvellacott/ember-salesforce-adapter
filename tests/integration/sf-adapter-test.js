@@ -75,12 +75,11 @@ test('exists through the store', function(assert) {
   assert.ok(sfAdapter, 'SFAdapter exists');
 });
 
-test( 'SFAdapter.createRecord', function( t ) {
+test( 'create record and query by name', function( t ) {
   t.expect(1);
   const done = t.async();
 
   var expectedRecord = {
-    id : null,
     Name : 'Our House',
     isBigHouse__c : true,
     housePartyTime__c : "2017-01-01T12:00:00.000Z",
@@ -100,55 +99,56 @@ test( 'SFAdapter.createRecord', function( t ) {
   var record = run(store, 'createRecord', 'house-objccc', expectedRecord);
 
   // set all non-updateable fields to null and false on the expected record as that's how they should return
-  expectedRecord.isBigHouse__c = false;
-  expectedRecord.insurances__c = null;
-  expectedRecord.ownerContact__c = null;
+  // expectedRecord.isBigHouse__c = false;
+  // expectedRecord.insurances__c = null;
+  // expectedRecord.ownerContact__c = null;
 
   run(record, 'save').then(() => {
     run(store, 'query', 'house-objccc', "Name = '" + expectedRecord.Name + "'").then(records => {
       var result = records.objectAt(0).serialize();
-
-      // set the id on the result to null for comparison because the id isn't known before save
-      result.id = null;
       t.deepEqual(result, expectedRecord, "Record saved and unchanged");
       done();
     });
   });
 });
 
-// test( 'SFAdapter.findRecord', function( t ) {
-//   // Setup
-//   var fa = new SFAdapter();
-//   var store = new Store();
-  
-//   for(var emberModelName in houseSchema.snapshots) {
-//     var emberModel = models[emberModelName];
-//     emberModel.modelName = emberModelName;
-  
-//     var modelSSs = houseSchema.snapshots[emberModelName];
-//     var payloads = houseSchema.payloads[emberModelName];
-//     for(var i = 0; i < modelSSs.length; i++) {
-//       var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-//       var snapshot = new Snapshot(mockInstance);
-//       run(fa, 'createRecord', store, emberModel, snapshot);
-//       run(fa, 'findRecord', store, emberModel, snapshot.id);
-//       // fa.createRecord(store, emberModel, snapshot);
-//       // fa.findRecord(store, emberModel, snapshot.id);
-//       // console.log('!PAYLOADS!');
-//       // console.log(payloads);
-//       for(var key in payloads[i]) {
-//         for(var field in payloads[i][key][0]) {
-//           if(typeof payloads[i][key][0][field] !== 'object') {
-//             // console.log('store: ' + JSON.stringify)
-//             t.equal(store.payload[key][0][field], payloads[i][key][0][field], 'Object creation failed on the field: ' + field + ' in object list: ' + key); 
-//           }
-//           else
-//           { t.deepEqual(store.payload[key][0][field], payloads[i][key][0][field], 'Object creation failed on the field: ' + field + ' in object list: ' + key); }
-//         }
-//       }
-//     }
-//   }
-// });
+test( 'create and find record', function( t ) {
+  t.expect(1);
+  const done = t.async();
+
+  var expectedRecord = {
+    // id : null,
+    Name : 'Our House',
+    isBigHouse__c : true,
+    housePartyTime__c : "2017-01-01T12:00:00.000Z",
+    cost__c : 70000,
+    readyByDate__c : "2017-01-01T00:00:00.000Z",
+    ownerContact__c : "Kimberly",
+    height__c : 7,
+    address__c : 'Blackfriars',
+    contactPhone__c : '07461231236',
+    floorPlan__c : 'large',
+    insurances__c : 'only required',
+    description__c : 'beautiful',
+    alarmPin__c : "1234",
+    website__c : 'ourhouse.com',
+    floors__c : 3,
+  };
+  var record = run(store, 'createRecord', 'house-objccc', expectedRecord);
+
+  // set all non-updateable fields to null and false on the expected record as that's how they should return
+  // expectedRecord.isBigHouse__c = false;
+  // expectedRecord.insurances__c = null;
+  // expectedRecord.ownerContact__c = null;
+
+  run(record, 'save').then((res) => {
+    run(store, 'findRecord', 'house-objccc', res.id).then(result => {
+      // set the id on the result to null for comparison because the id isn't known before save
+      t.deepEqual(result.serialize(), expectedRecord, "Record saved and unchanged");
+      done();
+    });
+  });
+});
 
 // test( 'SFAdapter.updateRecord', function( t ) {
 //   // Setup
