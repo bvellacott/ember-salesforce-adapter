@@ -143,37 +143,85 @@ test( 'create and find record', function( t ) {
 
   run(record, 'save').then((res) => {
     run(store, 'findRecord', 'house-objccc', res.id).then(result => {
-      // set the id on the result to null for comparison because the id isn't known before save
       t.deepEqual(result.serialize(), expectedRecord, "Record saved and unchanged");
       done();
     });
   });
 });
 
-// test( 'SFAdapter.updateRecord', function( t ) {
-//   // Setup
-//   var fa = new SFAdapter();
-//   var store = new Store();
-  
-//   for(var emberModelName in houseSchema.snapshots) {
-//     var emberModel = models[emberModelName];
-//     emberModel.modelName = emberModelName;
-  
-//     var modelSSs = houseSchema.snapshots[emberModelName];
-//     var payloads = houseSchema.payloads[emberModelName];
-//     for(var i = 0; i < modelSSs.length; i++) {
-//       var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-//       var snapshot = new Snapshot(mockInstance);
-//       fa.createRecord(store, emberModel, snapshot);
-//       mockInstance = $.extend({ _model : emberModel }, modelSSs[i], { Name : 'updated' });
-//       snapshot = new Snapshot(mockInstance);
-//       fa.updateRecord(store, emberModel, snapshot);
-//       fa.findRecord(store, emberModel, snapshot.id);
-//       for(var key in payloads[i])
-//       { t.equal(store.payload[key][0]['Name'], 'updated', 'Name field didn\'t get updated'); }
-//     }
-//   }
-// });
+test( 'create, save, change and save record', function( t ) {
+  t.expect(4);
+  const done = t.async(2);
+
+  var house = run(store, 'createRecord', 'house-objccc', {
+    Name : 'Our House',
+    isBigHouse__c : true,
+    housePartyTime__c : "2017-01-01T12:00:00.000Z",
+    cost__c : 70000,
+    readyByDate__c : "2017-01-01T00:00:00.000Z",
+    ownerContact__c : "Kimberly",
+    height__c : 7,
+    address__c : 'Blackfriars',
+    contactPhone__c : '07461231236',
+    floorPlan__c : 'large',
+    insurances__c : 'only required',
+    description__c : 'beautiful',
+    alarmPin__c : "1234",
+    website__c : 'ourhouse.com',
+    floors__c : 3,
+  });
+
+  run(house, 'save').then((record1) => {
+    record1.set('Name', 'Our Small House');
+    record1.set('isBigHouse__c', false);
+    record1.set('alarmPin__c', '0000');
+    record1.set('website__c', 'oursmallhouse.com');
+    record1.set('cost__c', 60000);
+    run(record1, 'save').then((record2) => {
+      run(store, 'findRecord', 'house-objccc', record2.id).then(result => {
+        t.deepEqual(result.serialize(), {
+            Name : 'Our Small House',
+            isBigHouse__c : false,
+            housePartyTime__c : "2017-01-01T12:00:00.000Z",
+            cost__c : 60000,
+            readyByDate__c : "2017-01-01T00:00:00.000Z",
+            ownerContact__c : "Kimberly",
+            height__c : 7,
+            address__c : 'Blackfriars',
+            contactPhone__c : '07461231236',
+            floorPlan__c : 'large',
+            insurances__c : 'only required',
+            description__c : 'beautiful',
+            alarmPin__c : "0000",
+            website__c : 'oursmallhouse.com',
+            floors__c : 3,
+          }, "House record saved and unchanged");
+        done();
+      });
+    });
+  });
+
+  var expectedRecord = {
+    Name : 'Front Door',
+    knobType__c : 'bronze',
+    house__c : house,
+  };
+
+  var door = run(store, 'createRecord', 'door-objccc', expectedRecord);
+
+  run(door, 'save').then((record1) => {
+    record1.set('Name', 'Back Door');
+    record1.set('knobType__c', 'wood');
+    run(record1, 'save').then((record2) => {
+      run(store, 'findRecord', 'door-objccc', record2.id).then(result => {
+        t.equal(result.get('Name'), 'Back Door', 'Name');
+        t.equal(result.get('knobType__c'), 'wood', 'knobType__c');
+        t.ok(result.get('house__c'), 'house__c');
+        done();
+      });
+    });
+  });
+});
 
 // test( 'SFAdapter.deleteRecord', function( t ) {
 //   // Setup

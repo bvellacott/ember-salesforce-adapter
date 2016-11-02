@@ -18,7 +18,7 @@ var SFAdapter = DS.RESTAdapter.extend({
         var obj = SFModels.sfFormatSnapshot(snapshot, type);
         SFAdapter.sforce.connection.create([obj], 
         function(res) {
-          var obj = snapshot.serialize();
+          var obj = snapshot.attributes();
           obj.id = res[0].id;
           var pl = {};
           // snapshot.type = Ember.String.dasherize(type.modelName);
