@@ -208,7 +208,7 @@ test( 'create, save, change and save record', t => {
   });
 });
 
-test( 'SFAdapter.deleteRecord', t => {
+test( 'delete record', t => {
   t.expect(1);
   const done = t.async();
 
@@ -233,7 +233,7 @@ test( 'SFAdapter.deleteRecord', t => {
   });
 });
 
-test( 'SFAdapter.findAll', t => {
+test( 'findAll', t => {
   t.expect(3);
   const done = t.async();
 
@@ -245,62 +245,73 @@ test( 'SFAdapter.findAll', t => {
       isDoubleGlazed__c : true,
     });
 
-    run(window, 'save').then(window => {
-      t.deepEqual(window.serialize(), {
-        Name : 'window1',
-        isDoubleGlazed__c : true,
-        parent__c : null,
-      }, 'window saved and unchanged');
+    run(window, 'save').then(() => {
+      run(store, 'findAll', 'window-objccc').then( results => {
+        var window = results.objectAt(0);
+        t.deepEqual(window.serialize(), {
+          Name : 'window1',
+          isDoubleGlazed__c : true,
+          parent__c : null,
+        }, 'window saved and unchanged');
 
-      var window2 = run(store, 'createRecord', 'window-objccc', {   
-        Name : 'window2',
-        isDoubleGlazed__c : true,
-      });
+        var window2 = run(store, 'createRecord', 'window-objccc', {   
+          Name : 'window2',
+          isDoubleGlazed__c : true,
+        });
 
-      run(window2, 'save').then(() => {
-        run(store, 'findAll', 'window-objccc').then( results => {
-          t.equal(results.get('length'), 2, 'Two windows in store');
-          done();
+        run(window2, 'save').then(() => {
+          run(store, 'findAll', 'window-objccc').then( results => {
+            t.equal(results.get('length'), 2, 'Two windows in store');
+            done();
+          });
         });
       });
     });
   });
 });
 
-// test( 'SFAdapter.findMany', t => {
-//   // Setup
-//   var fa = new SFAdapter();
-//   var store = new Store();
-  
-//   var callFindMany = function(){
-//     fa.findMany(store, emberModel, ids).then(function(result){
-//       var i;
-//       var checkResult = function(){
-//         fa.findRecord(store, models[emberModelName], result[key][i]['id']).then(function(singleRes) {
-//           t.deepEqual(result[key][i], singleRes[key][0], 'findAll failed');
-//         });
-//       };
-//       for(var key in result) {
-//         for(i = 0; i < result[key].length; i++) {
-//           run(checkResult);
-//         }
-//       }
-//     });
-//   };
 
-//   for(var emberModelName in houseSchema.snapshots) {
-//     var emberModel = models[emberModelName];
-//     emberModel.modelName = emberModelName;
-  
-//     var modelSSs = houseSchema.snapshots[emberModelName];
-//     // var payloads = houseSchema.payloads[emberModelName];
-//     var ids = [];
-//     for(var i = 0; i < modelSSs.length; i++) {
-//       var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-//       var snapshot = new Snapshot(mockInstance);
-//       ids.push(snapshot.id);
-//       fa.createRecord(store, emberModel, snapshot);
-//     }
-//     run(callFindMany);
-//   }
-// });
+test( 'query', t => {
+  t.expect(6);
+  const done = t.async();
+
+  run(store, 'query', 'window-objccc', "Name = 'no record with this name'").then( results => {
+    t.equal(results.get('length'), 0, 'failure with empty result');
+
+    var window = run(store, 'createRecord', 'window-objccc', {   
+      Name : 'window1',
+      isDoubleGlazed__c : true,
+    });
+
+    run(window, 'save').then(() => {
+      run(store, 'query', 'window-objccc', "Name = 'window1'").then( results => {
+        var window1 = results.objectAt(0);
+        t.deepEqual(window1.serialize(), {
+          Name : 'window1',
+          isDoubleGlazed__c : true,
+          parent__c : null,
+        }, 'window saved and unchanged');
+
+        var window2 = run(store, 'createRecord', 'window-objccc', {   
+          Name : 'window2',
+          isDoubleGlazed__c : true,
+        });
+        // run(Ember.RSVP.all([window1, window2]), 'invoke', 'save').then(windows => {
+        Ember.RSVP.all(Ember.A([window1, window2]).invoke('save')).then(windows => {
+          var w1id = windows[0].get('id');
+          var w2id = windows[1].get('id');
+          t.ok(w1id, 'window1 saved');
+          t.ok(w2id, 'window2 saved');
+          run(store, 'query', 'window-objccc', "isDoubleGlazed__c = true").then( windows => {
+            t.equal(windows.get('length'), 2, 'Both windows returned');
+            run(store, 'query', 'window-objccc', "Name = 'window2'").then( windows => {
+              t.equal(windows.get('length'), 1, 'One window returned');
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
+});
+
