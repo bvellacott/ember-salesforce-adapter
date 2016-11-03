@@ -55,27 +55,12 @@ module('integration/adapters/sf-adapter - SFAdapter', {
   }
 });
 
-// module('integration/adapters/sf-adapter - SFAdapter', {
-//   beforeEach() {
-//     console.log(sforce);
-//     mockSchemaReader = new SFModels.SchemaReader(connection, 100, () => { console.log('fetch complete'); });
-//     sforce.db.clear();
-//     sforce.db.useGivenIds = true;
-//     sforce.db.schema = houseSchema.sfSchema;
-//     models = {};
-//     SFModels.createModelsForSObjects(models, mockSchemaReader.completeMetas, mockSchemaReader, houseSchema.typeFilter);
-//   },
-
-//   afterEach() {
-//   }
-// });
-
-test('exists through the store', function(assert) {
+test('exists through the store', t => {
   const sfAdapter = store.adapterFor('-default');
-  assert.ok(sfAdapter, 'SFAdapter exists');
+  t.ok(sfAdapter, 'SFAdapter exists');
 });
 
-test( 'create record and query by name', function( t ) {
+test( 'create record and query by name', t => {
   t.expect(1);
   const done = t.async();
 
@@ -112,7 +97,7 @@ test( 'create record and query by name', function( t ) {
   });
 });
 
-test( 'create and find record', function( t ) {
+test( 'create and find record', t => {
   t.expect(1);
   const done = t.async();
 
@@ -141,7 +126,7 @@ test( 'create and find record', function( t ) {
   // expectedRecord.insurances__c = null;
   // expectedRecord.ownerContact__c = null;
 
-  run(record, 'save').then((res) => {
+  run(record, 'save').then(res => {
     run(store, 'findRecord', 'house-objccc', res.id).then(result => {
       t.deepEqual(result.serialize(), expectedRecord, "Record saved and unchanged");
       done();
@@ -149,7 +134,7 @@ test( 'create and find record', function( t ) {
   });
 });
 
-test( 'create, save, change and save record', function( t ) {
+test( 'create, save, change and save record', t => {
   t.expect(4);
   const done = t.async(2);
 
@@ -171,13 +156,13 @@ test( 'create, save, change and save record', function( t ) {
     floors__c : 3,
   });
 
-  run(house, 'save').then((record1) => {
+  run(house, 'save').then(record1 => {
     record1.set('Name', 'Our Small House');
     record1.set('isBigHouse__c', false);
     record1.set('alarmPin__c', '0000');
     record1.set('website__c', 'oursmallhouse.com');
     record1.set('cost__c', 60000);
-    run(record1, 'save').then((record2) => {
+    run(record1, 'save').then(record2 => {
       run(store, 'findRecord', 'house-objccc', record2.id).then(result => {
         t.deepEqual(result.serialize(), {
             Name : 'Our Small House',
@@ -209,10 +194,10 @@ test( 'create, save, change and save record', function( t ) {
 
   var door = run(store, 'createRecord', 'door-objccc', expectedRecord);
 
-  run(door, 'save').then((record1) => {
+  run(door, 'save').then(record1 => {
     record1.set('Name', 'Back Door');
     record1.set('knobType__c', 'wood');
-    run(record1, 'save').then((record2) => {
+    run(record1, 'save').then(record2 => {
       run(store, 'findRecord', 'door-objccc', record2.id).then(result => {
         t.equal(result.get('Name'), 'Back Door', 'Name');
         t.equal(result.get('knobType__c'), 'wood', 'knobType__c');
@@ -223,7 +208,7 @@ test( 'create, save, change and save record', function( t ) {
   });
 });
 
-test( 'SFAdapter.deleteRecord', function( t ) {
+test( 'SFAdapter.deleteRecord', t => {
   t.expect(1);
   const done = t.async();
 
@@ -248,43 +233,41 @@ test( 'SFAdapter.deleteRecord', function( t ) {
   });
 });
 
-// test( 'SFAdapter.findAll', function( t ) {
-//   // Setup
-//   var fa = new SFAdapter();
-//   var store = new Store();
-  
-//   var callFindAll = function(){
-//     fa.findAll(store, emberModel).then(function(result){
-//       var i;
-//       var checkResult = function(){
-//         fa.findRecord(store, models[emberModelName], result[key][i]['id']).then(function(singleRes) {
-//           t.deepEqual(result[key][i], singleRes[key][0], 'findAll failed');
-//         });
-//       };
-//       for(var key in result) {
-//         for(i = 0; i < result[key].length; i++) {
-//           run(checkResult);
-//         }
-//       }
-//     });
-//   };
+test( 'SFAdapter.findAll', t => {
+  t.expect(3);
+  const done = t.async();
 
-//   for(var emberModelName in houseSchema.snapshots) {
-//     var emberModel = models[emberModelName];
-//     emberModel.modelName = emberModelName;
-  
-//     var modelSSs = houseSchema.snapshots[emberModelName];
-//     // var payloads = houseSchema.payloads[emberModelName];
-//     for(var i = 0; i < modelSSs.length; i++) {
-//       var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-//       var snapshot = new Snapshot(mockInstance);
-//       fa.createRecord(store, emberModel, snapshot);
-//     }
-//     run(callFindAll);
-//   }
-// });
+  run(store, 'findAll', 'window-objccc').then( results => {
+    t.equal(results.get('length'), 0, 'store empty');
 
-// test( 'SFAdapter.findMany', function( t ) {
+    var window = run(store, 'createRecord', 'window-objccc', {   
+      Name : 'window1',
+      isDoubleGlazed__c : true,
+    });
+
+    run(window, 'save').then(window => {
+      t.deepEqual(window.serialize(), {
+        Name : 'window1',
+        isDoubleGlazed__c : true,
+        parent__c : null,
+      }, 'window saved and unchanged');
+
+      var window2 = run(store, 'createRecord', 'window-objccc', {   
+        Name : 'window2',
+        isDoubleGlazed__c : true,
+      });
+
+      run(window2, 'save').then(() => {
+        run(store, 'findAll', 'window-objccc').then( results => {
+          t.equal(results.get('length'), 2, 'Two windows in store');
+          done();
+        });
+      });
+    });
+  });
+});
+
+// test( 'SFAdapter.findMany', t => {
 //   // Setup
 //   var fa = new SFAdapter();
 //   var store = new Store();

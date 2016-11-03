@@ -28,14 +28,14 @@ var SFAdapter = DS.RESTAdapter.extend({
           Ember.run(null, resolve, pl);
           
           // Update record in the background - in case it has values that are calculated on the server
-          SFModels.query(store, type, "Id = '" + res[0].id + "'", 
-            function(res) {
-              var r = SFModels.formatPayload(type, res);
-              store.pushPayload(type.modelName, r);
-            }, 
-            function(err) { 
-              console.log(err); 
-          });
+          // SFModels.query(store, type, "Id = '" + res[0].id + "'", 
+          //   function(res) {
+          //     var r = SFModels.formatPayload(type, res);
+          //     store.pushPayload(type.modelName, r);
+          //   }, 
+          //   function(err) { 
+          //     console.log(err); 
+          // });
         },
         function(err) { 
           console.log(err); 
