@@ -223,28 +223,30 @@ test( 'create, save, change and save record', function( t ) {
   });
 });
 
-// test( 'SFAdapter.deleteRecord', function( t ) {
-//   // Setup
-//   var fa = new SFAdapter();
-//   var store = new Store();
-  
-//   for(var emberModelName in houseSchema.snapshots) {
-//     var emberModel = models[emberModelName];
-//     emberModel.modelName = emberModelName;
-  
-//     var modelSSs = houseSchema.snapshots[emberModelName];
-//     // var payloads = houseSchema.payloads[emberModelName];
-//     for(var i = 0; i < modelSSs.length; i++) {
-//       var mockInstance = $.extend({ _model : emberModel }, modelSSs[i]);
-//       var snapshot = new Snapshot(mockInstance);
-//       fa.createRecord(store, emberModel, snapshot);
-//       fa.deleteRecord(store, emberModel, snapshot);
-//       store.payload = null;
-//       fa.findRecord(store, emberModel, snapshot.id);
-//       t.deepEqual(store.payload, null, 'Delete failed');
-//     }
-//   }
-// });
+test( 'SFAdapter.deleteRecord', function( t ) {
+  t.expect(1);
+  const done = t.async();
+
+  var expectedRecord = {
+    Name : 'Front Door',
+    knobType__c : 'bronze',
+  };
+
+  var door = run(store, 'createRecord', 'door-objccc', expectedRecord);
+
+  run(door, 'save').then(record1 => {
+    run(store, 'findRecord', 'door-objccc', record1.id).then(result => {
+      result.deleteRecord();
+      result.on('didDelete', () => {
+        run(store, 'query', 'door-objccc', "Name = 'Front Door'").then(results => {
+          t.equal(results.get('length'), 0, 'Door deleted');
+          done();
+        });
+      });
+      result.save();
+    });
+  });
+});
 
 // test( 'SFAdapter.findAll', function( t ) {
 //   // Setup
