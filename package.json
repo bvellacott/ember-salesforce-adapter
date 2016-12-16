@@ -1,6 +1,6 @@
 {
   "name": "ember-salesforce-adapter",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "The default blueprint for ember-cli addons.",
   "directories": {
     "doc": "doc",
@@ -38,17 +38,18 @@
     "ember-load-initializers": "^0.5.1",
     "ember-resolver": "^2.0.3",
     "ember-try": "^0.2.2",
-    "loader.js": "^4.0.1",
-    "sforce-mocks": "^1.0.1"
+    "loader.js": "^4.0.1"
   },
   "keywords": [
     "ember-addon"
   ],
   "dependencies": {
     "ember-cli-babel": "^5.1.6",
-    "salesforce-ember-models": "^1.0.5" 
+    "salesforce-ember-models": "^1.0.5", 
+    "sforce-mocks": "^1.0.1"
   },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "after": "ember-data"
   }
 }

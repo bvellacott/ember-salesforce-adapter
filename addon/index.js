@@ -1,4 +1,4 @@
-import SFAdapter from 'smack-ember-adapters/adapters/ls-adapter';
+import SFAdapter from 'ember-salesforce-adapter/adapters/sf-adapter';
 
 export {
   SFAdapter

@@ -83,11 +83,6 @@ test( 'create record and query by name', t => {
   };
   var record = run(store, 'createRecord', 'house-objccc', expectedRecord);
 
-  // set all non-updateable fields to null and false on the expected record as that's how they should return
-  // expectedRecord.isBigHouse__c = false;
-  // expectedRecord.insurances__c = null;
-  // expectedRecord.ownerContact__c = null;
-
   run(record, 'save').then(() => {
     run(store, 'query', 'house-objccc', "Name = '" + expectedRecord.Name + "'").then(records => {
       var result = records.objectAt(0).serialize();
@@ -120,11 +115,6 @@ test( 'create and find record', t => {
     floors__c : 3,
   };
   var record = run(store, 'createRecord', 'house-objccc', expectedRecord);
-
-  // set all non-updateable fields to null and false on the expected record as that's how they should return
-  // expectedRecord.isBigHouse__c = false;
-  // expectedRecord.insurances__c = null;
-  // expectedRecord.ownerContact__c = null;
 
   run(record, 'save').then(res => {
     run(store, 'findRecord', 'house-objccc', res.id).then(result => {

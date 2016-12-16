@@ -5,7 +5,7 @@ SFModels.Ember = Ember;
 SFModels.DS = DS;  
 
 var SFAdapter = DS.RESTAdapter.extend({
-  sforce: window.sforce ? window.sforce : undefined,
+  sforce: window.sforce || undefined,
   find : function(store, type, id, snapshot) {
     return this.findRecord(store, type, id, snapshot);
   },
@@ -16,7 +16,7 @@ var SFAdapter = DS.RESTAdapter.extend({
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
         var obj = SFModels.sfFormatSnapshot(snapshot, type);
-        SFAdapter.sforce.connection.create([obj], 
+        SFAdapter.getSforce().connection.create([obj], 
         function(res) {
           var obj = snapshot.attributes();
           obj.id = res[0].id;
@@ -53,7 +53,7 @@ var SFAdapter = DS.RESTAdapter.extend({
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
         var obj = SFModels.sfFormatSnapshot(snapshot, type);
-        SFAdapter.sforce.connection.update([obj], 
+        SFAdapter.getSforce().connection.update([obj], 
         function(res) {
           SFModels.formatRecord(obj);
           var pl = {};
@@ -85,7 +85,7 @@ var SFAdapter = DS.RESTAdapter.extend({
   deleteRecord: function(store, type, snapshot) {
     return new Ember.RSVP.Promise(function(resolve, reject) {
       try {
-        SFAdapter.sforce.connection.deleteIds([snapshot.id], 
+        SFAdapter.getSforce().connection.deleteIds([snapshot.id], 
         function() {
           Ember.run(null, resolve, {});
         },
@@ -134,5 +134,9 @@ var SFAdapter = DS.RESTAdapter.extend({
   shouldReloadAll : function(store, snapshot) { return store.peekAll( snapshot.type.modelName ).get("length") <= 0; },
   shouldBackgroundReloadRecord : function() { return true; },
 });
+
+SFAdapter.getSforce = function() {
+  return SFAdapter.sforce || SFAdapter.prototype.sforce || window.sforce || undefined;
+};
 
 export default SFAdapter;
