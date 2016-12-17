@@ -21,9 +21,6 @@ var SFAdapter = DS.RESTAdapter.extend({
           var obj = snapshot.attributes();
           obj.id = res[0].id;
           var pl = {};
-          // snapshot.type = Ember.String.dasherize(type.modelName);
-          // snapshot.modelName = snapshot.type;
-          // pl[snapshot.type] = snapshot;
           pl[type.modelName] = obj;
           Ember.run(null, resolve, pl);
           
